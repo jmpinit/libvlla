@@ -36,10 +36,16 @@ int color_wiring(uint32_t c);
 void format_led(uint32_t* pixels, uint8_t* data, int len);
 int open_serial(char* portname);
 
-VLLA* vlla_init(char* ser1, char* ser2) {
+VLLA* vlla_create() {
     // create vlla representation
     VLLA* vlla = calloc(1, sizeof(VLLA));
     vlla->pixels = calloc(PIXEL_COUNT, sizeof(uint32_t));
+
+    return vlla;
+}
+
+VLLA* vlla_init(char* ser1, char* ser2) {
+    VLLA* vlla = vlla_create();
 
     // setup communication to actual display
     vlla->ser1_fd = open_serial(ser1);
