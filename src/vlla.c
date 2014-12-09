@@ -31,6 +31,9 @@ typedef struct {
     uint8_t time_h;
 } SyncInfo;
 
+uint8_t* led_data_top;
+uint8_t* led_data_bottom;
+
 // local functions
 int color_wiring(uint32_t c);
 void format_led(uint32_t* pixels, uint8_t* data, int len);
@@ -46,7 +49,7 @@ VLLA* vlla_create() {
 
 VLLA* vlla_init(char* ser1, char* ser2) {
     VLLA* vlla = vlla_create();
-
+    
     // setup communication to actual display
     vlla->ser1_fd = open_serial(ser1);
     vlla->ser2_fd = open_serial(ser2);
@@ -55,6 +58,9 @@ VLLA* vlla_init(char* ser1, char* ser2) {
     serial_set_interface_attribs(vlla->ser2_fd, B115200, 0);
 
     // TODO ask display for information
+
+    led_data_top = calloc(SERIAL_DATA_LEN, sizeof(uint8_t));
+    led_data_bottom = calloc(SERIAL_DATA_LEN, sizeof(uint8_t));
 
     return vlla;
 }
@@ -70,9 +76,6 @@ void vlla_update(VLLA* vlla) {
 
     //SyncInfo slave_info = { ROLE_SLAVE, 0, 0 };
 
-    uint8_t* led_data_top = calloc(SERIAL_DATA_LEN, sizeof(uint8_t));
-    uint8_t* led_data_bottom = calloc(SERIAL_DATA_LEN, sizeof(uint8_t));
-    
     format_led(vlla->pixels + PIXEL_COUNT/2, led_data_top, PIXEL_COUNT/2);
     format_led(vlla->pixels, led_data_bottom, PIXEL_COUNT/2);
 
