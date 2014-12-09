@@ -66,7 +66,8 @@ VLLA* vlla_init(char* ser1, char* ser2) {
 }
 
 void vlla_update(VLLA* vlla) {
-    uint16_t synctime = (uint16_t)((1000000.0 / FRAMERATE) * 0.75);
+    //uint16_t synctime = (uint16_t)((1000000.0 / FRAMERATE) * 0.75);
+    static uint16_t synctime = 0x0000;
 
     SyncInfo master_info = {
         ROLE_MASTER,
@@ -74,19 +75,24 @@ void vlla_update(VLLA* vlla) {
         synctime >> 8
     };
 
-    //SyncInfo slave_info = { ROLE_SLAVE, 0, 0 };
+    SyncInfo slave_info = {
+        ROLE_SLAVE,
+        synctime & 0xFF,
+        synctime >> 8
+    };
 
     format_led(vlla->pixels + PIXEL_COUNT/2, led_data_top, PIXEL_COUNT/2);
     format_led(vlla->pixels, led_data_bottom, PIXEL_COUNT/2);
+
+    // write to slave controller
+    write(vlla->ser1_fd, &slave_info, sizeof(SyncInfo)); 
+    write(vlla->ser1_fd, led_data_bottom, SERIAL_DATA_LEN); 
 
     // write to master controller
     write(vlla->ser2_fd, &master_info, sizeof(SyncInfo));
     write(vlla->ser2_fd, led_data_top, SERIAL_DATA_LEN); 
 
-    // write to slave controller
-    write(vlla->ser1_fd, &master_info, sizeof(SyncInfo)); 
-    write(vlla->ser1_fd, led_data_bottom, SERIAL_DATA_LEN); 
-    tcdrain(vlla->ser1_fd);
+    tcdrain(vlla->ser2_fd);
 }
 
 void vlla_close(VLLA* vlla) {
