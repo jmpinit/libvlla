@@ -1,6 +1,10 @@
 # libvlla
 
-Shared library for controlling the Very Large LED Array.
+Shared library for controlling the Very Large LED Array ([videos of it here](https://vimeo.com/album/3318776)).
+
+![sound reactive](http://i.imgur.com/p98LX7s.gif)
+
+![credit panda to fairlight](http://i.imgur.com/o1HWVAY.gif)
 
 ## Compilation
 
